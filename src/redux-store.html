@@ -1,0 +1,109 @@
+
+<link rel="import" href="../bower_components/polymer-redux/polymer-redux.html">
+
+<script>
+    const initialState = {
+        message: 'Uchiha Hakke',
+        friends: ['Hakke'],
+        loading: false,
+        username: null
+    };
+
+    // Observing object sub properties and array mutations does not work with PolymerRedux. 
+    // Redux state is immutable by design, reducers must always return new state.
+    // This means that when mutating arrays or objects your reducer will look something similar to below.
+
+    const reducer = (state, action) => {
+        if(!state) return initialState;
+
+        switch(action.type){
+            case 'ADD_FRIEND': 
+                const friends = state.friends.slice(0);
+                friends.push(action.friend);
+                return Object.assign({}, state, { friends: friends });
+            
+            case 'UPDATE_MESSAGE':
+                //always return new state
+                console.log('update mesage');
+                return Object.assign({}, state, {
+                    message: action.message //New Message   
+                });
+            
+            case 'SIGN_UP_STARTED':
+                return Object.assign({}, state, {loading: true})
+            
+            case 'SIGN_UP_COMPLETED': 
+                return Object.assign({}, state, {
+                    loading: false,
+                    username: action.username //action dan gelen username,  bunlar yeni state e koyuldu
+                });
+
+            default:
+                return state;
+        }
+
+    };
+
+
+    //Create a Redux Store 
+    // const store = Redux.createStore(reducer);
+
+    const store = Redux.createStore(
+        reducer,
+        Redux.applyMiddleware(ReduxThunk.default)
+    );
+
+    // Create the PolymerRedux mixin
+    const ReduxMixin = PolymerRedux(store);
+
+
+    //creating another behavior for async 
+    const AsyncActionBehavior = {
+        actions: {
+            signUpWithTimeout: (username) => {
+                return (dispatch) => {
+                    dispatch({
+                        type: 'SIGN_UP_STARTED'
+                    });
+
+                    setTimeout(() => {
+                        dispatch({
+                            type: 'SIGN_UP_COMPLETED',
+                            username: username
+                        })
+                    }, 3000);
+                }
+            },
+            addFriend: (friend) => {
+                return {
+                    type: 'ADD_FRIEND',
+                    friend: friend
+                }
+            },
+           asyncExample: () => {
+               return (dispatch) => {
+                   dispatch({
+                    type: 'ASYNC_EXAMPLE'
+                   });
+
+                   //again
+                   dispatch({
+                    type: 'ASYNC_EXAMPLE'
+                   });
+
+               }
+           }
+
+        }
+    };
+
+
+</script>
+
+
+<!-- Binding Properties
+Polymer Redux binds state to an Element’s property. It adds a new key for defining properties, statePath.
+
+statePath informs Polymer Redux where in the state it can find a property’s value. There are two types of bindings in Polymer Redux, Static Binding and Dynamic Binding.
+ -->
+

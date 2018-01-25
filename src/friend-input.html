@@ -1,0 +1,66 @@
+
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+
+<link rel="import" href="redux-store.html">
+
+
+<dom-module id="friend-input">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+        </style>
+
+        <input type="text" id="field">
+        
+        <paper-button on-tap="addFriend" raised>Add Friend</paper-button>
+        
+    </template>
+    <script>
+
+     //class MyElement extends MixinB(MixinA(Polymer.Element)) { ... }
+
+
+       class FriendInput extends ReduxMixin(Polymer.Element) {
+           
+            static get is(){
+                return 'friend-input'
+            }
+
+           static get actions(){
+               return {
+                    add(name){
+                        return{
+                            type: 'ADD_FRIEND',
+                            friend: name
+                        }
+                    }
+               };
+           }
+           /**
+             * Called every time the element is inserted into the DOM. Useful for 
+             * running setup code, such as fetching resources or rendering.
+             * Generally, you should try to delay work until this time.
+             */
+           connectedCallback() {
+               super.connectedCallback();
+           }
+
+           addFriend(){
+
+               const field = this.$.field;
+
+               if(field.value){
+                   this.dispatch('add', field.value);
+                   field.value = null;
+                   field.focus();
+               }
+           }
+       }
+
+       window.customElements.define(FriendInput.is, FriendInput);
+
+    </script>
+</dom-module>

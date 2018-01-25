@@ -1,0 +1,86 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+
+<link rel="import" href="shared-styles.html">
+<link rel="import" href="redux-store.html">
+
+
+
+<dom-module id="sign-up-form">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: block;
+
+        padding: 10px;
+      }
+    </style>
+
+    <label>
+      Username:
+      <input type="text" id="user">
+    </label>
+    
+    <paper-button raised on-tap="signUp">Sign Up!</paper-button>
+    
+    <template is="dom-if" if=[[loading]]>
+      <p>Loading....</p>
+    </template>
+    
+    <template is="dom-if" if=[[username]]>
+        <p>Welcome, [[username]] !</p>
+    </template>
+    
+
+
+  </template>
+
+  <script>
+
+    //getting related actions from redux-store.html
+    const { actions } = AsyncActionBehavior;
+
+    class SignUpForm extends ReduxMixin(Polymer.Element) {
+      static get is() { return 'sign-up-form'; }
+
+      static get properties() {
+        return {
+          loading:{
+            type: Boolean,
+            statePath: 'loading',
+            reflectToAttribute: true
+          },
+          username: {
+            type: String,
+            statePath: 'username',
+            reflectToAttribute: true
+          }
+        };
+      }
+
+      //Action'ları çağırabilmek için bu şekilde eklememiz gerekiyor, polymer-redux static action class'ından alıyor action'ları
+      static get actions(){
+        return actions;
+      }
+
+      signUp(){
+        let username = this.$.user.value;
+        //this.dispatch('addFriend', username);
+          this.dispatch('signUpWithTimeout', username);
+      }
+    }
+
+    window.customElements.define(SignUpForm.is, SignUpForm);
+
+  </script>
+</dom-module>

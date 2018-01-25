@@ -1,0 +1,100 @@
+
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="redux-store.html">
+
+
+
+<dom-module id="friend-counter">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+        </style>
+        <h3>[[message]]</h3>
+        <h3>You have [[friendCount]] friends!</h3>
+        
+    </template>
+    <script>
+        // Bind Elements using the mixin
+        class FriendCounter extends ReduxMixin(Polymer.Element){
+            static get is(){
+                return 'friend-counter'
+            }
+            
+            static get properties() {
+                return {
+                    friends: {
+                        type: Array,
+                        statePath: 'friends' //STATIC BINDING
+                        // statePath(state){ //DYNAMIC BINDING -- good for handling arrays
+                        //     return state.friends
+                        // }
+                        
+                        
+                        
+                         //user.address if u want to use sub property ;) 
+                    },
+                    friendCount: {
+                        type: Number,
+                        computed: 'computeFriendCount(friends)'
+                    },
+                    message: {
+                        type: String,
+                        statePath: 'message'
+                    }
+                };
+            }
+
+            static get actions() {
+                return {
+                    updateMessage(message){
+                        return {
+                            type: 'UPDATE_MESSAGE',
+                            message
+                        }
+                    }
+
+
+
+                };
+            }
+
+            connectedCallback() {
+                super.connectedCallback();
+
+                // For GETTING ALL STATE 
+                // const state = this.getState();
+
+
+                this.dispatch('updateMessage', 'this is awesome!');
+
+                setTimeout(() => {
+                    this.dispatch('updateMessage', 'this is fucking awesome!');
+                },1000);
+
+                
+                //Update message using the Action Creator
+
+                //Update message using Redux Thunk
+                // this.dispatch((dispatch) => {
+                //     dispatch('updateMessage', 'Please wait...');
+
+                //     //Do async task
+                //     setTimeout(() => {
+                //         dispatch('updateMessage', 'Sorry for being late!');
+                //     }, 1000);
+                // });
+                
+            }
+
+            computeFriendCount(friends){
+                return friends.length;
+            }
+            
+            
+        }
+
+        window.customElements.define(FriendCounter.is, FriendCounter);
+    </script>
+</dom-module>
